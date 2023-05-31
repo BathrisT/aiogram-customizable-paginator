@@ -66,30 +66,30 @@ async def main():
 paginator.start() возвращает отправленное сообщениею
 
 ## Параметры
-###chat_id:
+### chat_id:
 ID чата куда paginator будет отправлен.
-###objects:
+### objects:
 List of objects that will be used for display on the page. Объекты могут быть любого типа, функции для работы с ними вы задаете в передаваемых параметрах, которые описаны далее <br/>
 В примере выше: `objects=testing_products_database`
-###get_row_text_from_object_func:
+### get_row_text_from_object_func:
 Функция для получения строки из объекта. **Используется для формирования текстового списка, который будет отображаться в сообщении. **
 Первым аргументом функция принимает объект, вторым - его индекс, возвращает строку. 
 Если текстовый список в сообщении не будет использоваться, то можно не задавать этот параметр.<br/>
 В примере выше: `get_row_text_from_object_func=lambda obj, index: f'*{index + 1}.* {obj["name"]} - {obj["price"]} руб.'`
-###get_button_text_from_object_func:
+### get_button_text_from_object_func:
 **Функция для получения текста из объекта, который будет отображаться на кнопках.** 
 Первым аргументом функция принимает объект, вторым - его индекс, возвращает строку.
 Если кнопки для каждого отдельного объекта в пагинаторе не нужны, то можно не задавать этот параметр.<br/>
 Пример: `get_button_text_from_object_func=lambda obj, index: f'{obj["name"]} | {obj["price"]} руб.'`
 
-###get_callback_data_from_object_func:
+### get_callback_data_from_object_func:
 **Функция для получения callback-данных для кнопки из объекта.** Эти callback-данные будут отправляться при нажатии на кнопку соответствующую объекту.
 Первым аргументом функция принимает объект, вторым - его индекс, возвращает строку.
 Если кнопки для каждого отдельного объекта в пагинаторе не нужны, то можно не задавать этот параметр.<br/>
 Пример: `get_callback_data_from_object_func=lambda obj, index: f'open_product_{obj["product_id"]}'`
 
 
-###formatted_text_for_page:
+### formatted_text_for_page:
 **Это текст, который будет отображаться в сообщении**.
 В тексте в фигурных скобках можно задать следующие параметры:
 
@@ -114,22 +114,22 @@ formatted_text_for_page=('*Список продуктов доступных в
 
 Пример: `formatted_text_for_button_of_current_page='{page_number} из {pages_count}'`
 
-###page_size:
+### page_size:
 Количество элементов на странице
 
-###buttons_row_size:
+### buttons_row_size:
 Количество элементов в одной строке инлайн кнопок. По умолчанию 1.
 
-###symbol_left: 
+### symbol_left: 
 Символ отображаемый на инлайн кнопке листания влево
-###symbol_right: 
+### symbol_right: 
 Символ отображаемый на инлайн кнопке листания вправо
-###symbol_fill: 
+### symbol_fill: 
 Символ отображаемый на инлайн кнопках листания влево или вправо когда листать больше нельзя
-###parse_mode:
+### parse_mode:
 parse_mode который будет использоваться в пагинаторе
 
-##Примеры со скриншотами
+## Примеры со скриншотами
 [Первый пример](./examples/example_1.py)<br/>
 ![img.png](./img/img1.png)
 <br/>
