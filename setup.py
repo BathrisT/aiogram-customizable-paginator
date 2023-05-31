@@ -7,7 +7,7 @@ requirements = ["aiogram>2"]
 
 setup(
     name="aiogram-customizable-paginator",
-    version="0.0.1",
+    version="0.0.2",
     author="BathrosT",
     author_email="bathris12@gmail.com",
     description="Python library that provides functionality for paging through a list of objects. It allows you to easily navigate through the list using inline buttons",
