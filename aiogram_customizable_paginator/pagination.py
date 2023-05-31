@@ -155,6 +155,7 @@ class Paginator:
         )
         self._message_id = sent_message.message_id
         self.__class__.created_paginators_by_data[(self._chat_id, sent_message.message_id)] = self
+        return sent_message
 
     async def _open_page_by_number(self, page_number: int, bot_instance: Bot) -> Message:
         self.current_page = page_number
