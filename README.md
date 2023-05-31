@@ -7,7 +7,7 @@
 Use the package manager pip to install Aiogram Customizable Paginator.
 
 ```bash
-pip install aiogram-customizable-paginator
+pip install git+https://github.com/BathrisT/aiogram-customizable-paginator
 ```
 
 ## Использование
