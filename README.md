@@ -62,7 +62,7 @@ async def main():
     register_paginator(dp)
     dp.register_message_handler(open_products_list, commands=['products'])
 ```
-_paginator.start() возвращает отправленное сообщение._<br/>
+_paginator.send_message() возвращает отправленное сообщение._<br/>
 
 В указанном примере отправляется **новое сообщение** с paginator'ом. Мы так же можем **редактировать уже созданное сообщение,** чтобы сделать его paginator'ом (особенно полезно это в различных inline-меню). Делается это аналогично, только вместо вызова `paginator.send_message()` мы будем вызывать `paginator.edit_message()` с передачей туда chat_id, message_id и объекта бота:
 ```python
