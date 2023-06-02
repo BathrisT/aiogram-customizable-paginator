@@ -26,7 +26,6 @@ testing_products_database = [
 
 async def open_products_list(message: Message):
     paginator = Paginator(
-        chat_id=message.chat.id,
         objects=testing_products_database,
         page_size=4,
 
@@ -43,7 +42,7 @@ async def open_products_list(message: Message):
 
         ending_kb_elements=[[InlineKeyboardButton(text='В главное меню', callback_data='main_menu')]]
     )
-    await paginator.start(bot_instance=message.bot)
+    await paginator.send_message(chat_id=message.chat.id, bot_instance=message.bot)
 
 
 def register_all_handlers(dp):

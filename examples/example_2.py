@@ -26,7 +26,6 @@ testing_products_database = [
 
 async def open_products_list(message: Message):
     paginator = Paginator(
-        chat_id=message.chat.id,
         objects=testing_products_database,
         page_size=4,
         get_button_text_from_object_func=lambda obj, index: f'{obj["name"]} | {obj["price"]} руб.',
@@ -34,7 +33,7 @@ async def open_products_list(message: Message):
         formatted_text_for_page=('*Продукты, доступные в продаже*\n\n'
                                  '___Текущая страница - {page_number} из {pages_count}___')
     )
-    await paginator.start(bot_instance=message.bot)
+    await paginator.send_message(chat_id=message.chat.id, bot_instance=message.bot)
 
 
 def register_all_handlers(dp):

@@ -31,7 +31,7 @@ async def main():
         await bot.session.close()
 ```
 
-Далее, чтобы создать paginator, нужно создать объект класса `Paginator` передав нужные параметры (они описываются ниже), и вызвать метод `paginator.start()` с передачей объекта бота:
+Далее, чтобы создать paginator, нужно создать объект класса `Paginator` передав нужные параметры (они описываются ниже), и вызвать метод `paginator.send_message()` с передачей id чата и объекта бота:
 ```python
 from aiogram import Bot, Dispatcher
 from aiogram.types import Message
@@ -47,7 +47,6 @@ testing_products_database = [
 
 async def open_products_list(message: Message):
     paginator = Paginator(
-        chat_id=message.chat.id,
         objects=testing_products_database,
         page_size=4,
         get_row_text_from_object_func=lambda obj, index: f'*{index + 1}.* {obj["name"]} - {obj["price"]} руб.',
@@ -55,7 +54,7 @@ async def open_products_list(message: Message):
                                  '{rows_text}\n'
                                  '___Текущая страница - {page_number} из {pages_count}___')
     )
-    await paginator.start(bot_instance=message.bot)
+    await paginator.send_message(chat_id=message.chat.id, bot_instance=message.bot)
 
 async def main():
     bot = Bot(token='YOUR_BOT_TOKEN')
@@ -63,11 +62,29 @@ async def main():
     register_paginator(dp)
     dp.register_message_handler(open_products_list, commands=['products'])
 ```
-paginator.start() возвращает отправленное сообщение
+_paginator.start() возвращает отправленное сообщение._<br/>
+
+В указанном примере отправляется **новое сообщение** с paginator'ом. Мы так же можем **редактировать уже созданное сообщение,** чтобы сделать его paginator'ом (особенно полезно это в различных inline-меню). Делается это аналогично, только вместо вызова `paginator.send_message()` мы будем вызывать `paginator.edit_message()` с передачей туда chat_id, message_id и объекта бота:
+```python
+async def open_products_list1(callback: CallbackQuery):
+    paginator = Paginator(
+        objects=testing_products_database,
+        page_size=4,
+        get_row_text_from_object_func=lambda obj, index: f'*{index + 1}.* {obj["name"]} - {obj["price"]} руб.',
+        formatted_text_for_page=('*Список канцтоваров доступных в продаже:*\n\n'
+                                 '{rows_text}\n'
+                                 '___Текущая страница - {page_number} из {pages_count}___'),
+        ending_kb_elements=[[InlineKeyboardButton(text='Назад', callback_data='products_list')]]
+    )
+    await paginator.edit_message(
+        chat_id=callback.message.chat.id,
+        message_id=callback.message.message_id,
+        bot_instance=callback.bot
+    )
+```
+Посмотреть более подробный пример этого случая [можно здесь](./examples/example_4.py)
 
 ## Параметры
-### chat_id:
-ID чата куда paginator будет отправлен.
 ### objects:
 List of objects that will be used for display on the page. Объекты могут быть любого типа, функции для работы с ними вы задаете в передаваемых параметрах, которые описаны далее. <br/>
 Использование в примере выше: `objects=testing_products_database`
@@ -87,7 +104,6 @@ List of objects that will be used for display on the page. Объекты мог
 Первым аргументом функция принимает объект, вторым - его индекс, возвращает строку.
 Если кнопки для каждого отдельного объекта в paginator'е не нужны, то можно не задавать этот параметр.<br/>
 Пример: `get_callback_data_from_object_func=lambda obj, index: f'open_product_{obj["product_id"]}'`
-
 
 ### formatted_text_for_page:
 **Это текст, который будет отображаться в сообщении**.
@@ -114,6 +130,9 @@ formatted_text_for_page=('*Список продуктов доступных в
 
 Пример: `formatted_text_for_button_of_current_page='{page_number} из {pages_count}'`
 
+### starting_page:
+Индекс страницы, откуда запустится paginator. По умолчанию это 0
+
 ### page_size:
 Количество элементов на странице
 
@@ -138,3 +157,6 @@ parse_mode который будет использоваться в paginator'�
 <br/>
 [Третий пример](./examples/example_3.py)<br/>
 ![img.png](./img/img3.png)
+<br/>
+[Четвертый пример](./examples/example_3.py)<br/>
+_В четвертом примере вместо отправки paginator'а в новом сообщении мы редактируем старое_

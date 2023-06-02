@@ -13,7 +13,6 @@ class Paginator:
 
     def __init__(
             self,
-            chat_id: int,
             objects: list[Any],
             get_row_text_from_object_func: Optional[Callable[[Any, int], str]] = None,
             get_button_text_from_object_func: Optional[Callable[[Any, int], str]] = None,
@@ -26,10 +25,10 @@ class Paginator:
             symbol_fill: str = '•',
             formatted_text_for_button_of_current_page: str = ' {page_number} / {pages_count}',
             parse_mode: str = 'MARKDOWN',
+            starting_page: int = 0,
             ending_kb_elements: List[List[InlineKeyboardButton]] = None
     ):
         """
-        :param chat_id: id чата, в который будем отправлять пагинатор
         :param objects: объекты которые будут использоваться в отображении на странице
 
         :param get_row_text_from_object_func: функция получения строки из объекта.
@@ -50,6 +49,7 @@ class Paginator:
         page_number - номер текущей страницы
         pages_count - количество страниц
 
+        :param starting_page: страница, откуда запускается пагинатор
         :param page_size: количество элементов на странице
         :param buttons_row_size: количество элементов в строке кнопок
         :param symbol_left: символ перехода на пред страницу
@@ -72,10 +72,10 @@ class Paginator:
 
         self._parse_mode = parse_mode
 
-        self._chat_id = chat_id
+        self._chat_id = None
         self._message_id = None
 
-        self.current_page = 0
+        self.current_page = starting_page
         self.pages_count = (len(self._objects) + self.page_size - 1) // self.page_size
 
         if not ending_kb_elements: ending_kb_elements = []
@@ -140,22 +140,60 @@ class Paginator:
 
         return InlineKeyboardMarkup(inline_keyboard=kb)
 
-    async def start(
+    async def send_message(
             self,
+            chat_id: int,
             bot_instance: Bot
-    ) -> Message:
+    ):
+        """
+        Отправляет новое сообщение с пагинатором
+        """
         text = self._get_text_for_message()
         kb = self._get_keyboard_for_message()
+
+        if not chat_id:
+            chat_id = self._chat_id
+
         sent_message = await bot_instance.send_message(
-            chat_id=self._chat_id,
+            chat_id=chat_id,
             text=text,
             parse_mode=self._parse_mode,
             reply_markup=kb,
             disable_web_page_preview=True
         )
+        self._chat_id = chat_id
         self._message_id = sent_message.message_id
         self.__class__.created_paginators_by_data[(self._chat_id, sent_message.message_id)] = self
         return sent_message
+
+    async def edit_message(
+            self,
+            chat_id: int,
+            message_id: int,
+            bot_instance: Bot
+    ):
+        """
+        Редактирует указанное сообщение, делая его пагинатором.
+        Важно чтобы в этом сообщении до этого была прикреплена inline-клавиатура
+        """
+        text = self._get_text_for_message()
+        kb = self._get_keyboard_for_message()
+
+        if not chat_id:
+            chat_id = self._chat_id
+
+        edited_message = await bot_instance.edit_message_text(
+            chat_id=chat_id,
+            message_id=message_id,
+            text=text,
+            parse_mode=self._parse_mode,
+            reply_markup=kb,
+            disable_web_page_preview=True
+        )
+        self._chat_id = chat_id
+        self._message_id = message_id
+        self.__class__.created_paginators_by_data[(self._chat_id, message_id)] = self
+        return edited_message
 
     async def _open_page_by_number(self, page_number: int, bot_instance: Bot) -> Message:
         self.current_page = page_number
